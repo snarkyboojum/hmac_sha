@@ -58,6 +58,13 @@ fn hmac_sha512(key: &[u32], text: &[u32]) -> [u32; 16] {
             // concat with text
             //let k0_ipad_text = [&k0_ipad, text].concat();
             //let hash = sha512_hash(&k0_ipad_text);
+
+            // concat hash with k0_opad
+            // let k0_opad_hash = [&k0_opad, hash].concat();
+
+            // hash it
+            // let hmac = sha512_hash(&k0_opad_hash);
+            // return hmac;
         }
 
         Ordering::Greater => {}
