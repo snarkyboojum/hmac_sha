@@ -3,6 +3,7 @@ extern crate sha_hash;
 use byteorder::{BigEndian, ByteOrder};
 use sha_hash::sha512_hash;
 
+#[allow(dead_code)]
 enum HashBlockSize {
     FiveTwelve = 1024,
 }
