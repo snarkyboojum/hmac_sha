@@ -3,7 +3,6 @@ extern crate hmac_sha;
 use hmac_sha::hmac_sha512;
 use byteorder::{BigEndian, ByteOrder};
 
-
 fn main() {
     println!("Welcome to the HMAC-SHA512 implementation!");
 
