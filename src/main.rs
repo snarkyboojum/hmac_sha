@@ -20,50 +20,49 @@ fn hmac_sha512(key: &[u32], text: &[u32]) -> [u32; 16] {
     // determine K0
     use byteorder::{BigEndian, ByteOrder};
     use std::cmp::Ordering;
+
+    println!("text is: {:2x?}\n", text);
+    println!("key is: {:2x?}\n", key);
+    println!("------");
+
+    let mut text_bytes = vec![0u8; text.len() * 4];
+    BigEndian::write_u32_into(&text, &mut text_bytes);
+    let mut key_bytes = vec![0u8; key.len() * 4];
+    BigEndian::write_u32_into(&key, &mut key_bytes);
+
     match key_length_bits(key).cmp(&1024) {
         Ordering::Equal => {
-            // ipad
-            let mut ipad: [u8; 128] = [0u8; 128];
-            for elem in ipad.iter_mut() {
-                *elem = 0x36;
-            }
-            // opad
-            let mut opad: [u8; 128] = [0u8; 128];
-            for elem in opad.iter_mut() {
-                *elem = 0x5c;
-            }
+            let ipad = vec![0x36; 128];
+            let opad = vec![0x5c; 128];
 
-            let mut k0_ipad: [u8; 128] = [0u8; 128];
-            let mut k0_opad: [u8; 128] = [0u8; 128];
+            let mut k0_ipad = vec![0u8; 128];
+            let mut k0_opad = vec![0u8; 128];
             assert_eq!(key.len() * 4, ipad.len());
             assert_eq!(key.len() * 4, opad.len());
 
-            for (i, item) in key.iter().enumerate() {
-                let mut quad = [0; 4];
-                BigEndian::write_u32(&mut quad, *item);
-
-                // k0 xor ipad
-                k0_ipad[i] = ipad[i] ^ quad[0];
-                k0_ipad[i + 1] = ipad[i + 1] ^ quad[1];
-                k0_ipad[i + 2] = ipad[i + 2] ^ quad[2];
-                k0_ipad[i + 3] = ipad[i + 3] ^ quad[3];
-
-                // k0 xor opad
-                k0_opad[i] = opad[i] ^ quad[0];
-                k0_opad[i + 1] = opad[i + 1] ^ quad[1];
-                k0_opad[i + 2] = opad[i + 2] ^ quad[2];
-                k0_opad[i + 3] = opad[i + 3] ^ quad[3];
+            for (i, item) in key_bytes.iter().enumerate() {
+                k0_ipad[i] = ipad[i] ^ item;
+                k0_opad[i] = opad[i] ^ item;
             }
+            println!("k0^ipad is: {:2x?}\n", k0_ipad);
 
-            // concat with text
-            //let k0_ipad_text = [&k0_ipad, text].concat();
-            //let hash = sha512_hash(&k0_ipad_text);
+            // concat k0 + ipad + text
+            k0_ipad.extend(&text_bytes);
+            println!("(k0^ipad)||text is: {:2x?}\n", k0_ipad);
 
-            // concat hash with k0_opad
-            // let k0_opad_hash = [&k0_opad, hash].concat();
+            // hash and convert to bytes
+            let hash = sha512_hash(&k0_ipad).expect("Couldn't hash k0 + ipad + text");
+            let mut hash_bytes = vec![0u8; hash.len() * 8];
+            BigEndian::write_u64_into(&hash, &mut hash_bytes);
+            println!("hash((k0^ipad)||text) is: {:2x?}\n", hash);
 
-            // hash it
-            // let hmac = sha512_hash(&k0_opad_hash);
+            println!("k0^opad is: {:2x?}\n", k0_opad);
+            // concat (k0 ^ opad) and hash bytes
+            k0_opad.extend(&hash_bytes);
+            let hmac = sha512_hash(&k0_opad).expect("Couldn't do final hash for mac");
+
+            println!("mac is: {:2x?}", hmac);
+
             // return hmac;
         }
 
