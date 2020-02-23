@@ -79,10 +79,9 @@ fn main() {
     let message = "Sample message for keylen<blocklen";
 
     let key: &[u32] = &[
-        0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F,
-        0x10111213, 0x14151617, 0x18191A1B, 0x1C1D1E1F,
-        0x20212223, 0x24252627, 0x28292A2B, 0x2C2D2E2F,
-        0x30313233, 0x34353637, 0x38393A3B, 0x3C3D3E3F
+        0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F, 0x10111213, 0x14151617, 0x18191A1B,
+        0x1C1D1E1F, 0x20212223, 0x24252627, 0x28292A2B, 0x2C2D2E2F, 0x30313233, 0x34353637,
+        0x38393A3B, 0x3C3D3E3F,
     ];
 
     let mut key_bytes = vec![0u8; key.len() * 4];
@@ -110,8 +109,14 @@ mod tests {
         ];
 
         let mac_expected: &[u64] = &[
-            0xFC25E240658CA785, 0xB7A811A8D3F7B4CA, 0x48CFA26A8A366BF2, 0xCD1F836B05FCB024,
-            0xBD36853081811D6C, 0xEA4216EBAD79DA1C, 0xFCB95EA4586B8A0C, 0xE356596A55FB1347
+            0xFC25E240658CA785,
+            0xB7A811A8D3F7B4CA,
+            0x48CFA26A8A366BF2,
+            0xCD1F836B05FCB024,
+            0xBD36853081811D6C,
+            0xEA4216EBAD79DA1C,
+            0xFCB95EA4586B8A0C,
+            0xE356596A55FB1347,
         ];
 
         let mut key_bytes = vec![0u8; key.len() * 4];
@@ -122,7 +127,6 @@ mod tests {
         for (i, &hash) in hmac.iter().enumerate() {
             assert_eq!(hash, mac_expected[i]);
         }
-
     }
 
     #[test]
@@ -131,15 +135,20 @@ mod tests {
         let message = "Sample message for keylen<blocklen";
 
         let key: &[u32] = &[
-            0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F,
-            0x10111213, 0x14151617, 0x18191A1B, 0x1C1D1E1F,
-            0x20212223, 0x24252627, 0x28292A2B, 0x2C2D2E2F,
-            0x30313233, 0x34353637, 0x38393A3B, 0x3C3D3E3F
+            0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F, 0x10111213, 0x14151617, 0x18191A1B,
+            0x1C1D1E1F, 0x20212223, 0x24252627, 0x28292A2B, 0x2C2D2E2F, 0x30313233, 0x34353637,
+            0x38393A3B, 0x3C3D3E3F,
         ];
 
         let mac_expected: &[u64] = &[
-            0xFD44C18BDA0BB0A6, 0xCE0E82B031BF2818, 0xF6539BD56EC00BDC, 0x10A8A2D730B3634D,
-            0xE2545D639B0F2CF7, 0x10D0692C72A1896F, 0x1F211C2B922D1A96, 0xC392E07E7EA9FEDC
+            0xFD44C18BDA0BB0A6,
+            0xCE0E82B031BF2818,
+            0xF6539BD56EC00BDC,
+            0x10A8A2D730B3634D,
+            0xE2545D639B0F2CF7,
+            0x10D0692C72A1896F,
+            0x1F211C2B922D1A96,
+            0xC392E07E7EA9FEDC,
         ];
 
         let mut key_bytes = vec![0u8; key.len() * 4];
@@ -150,7 +159,6 @@ mod tests {
         for (i, &hash) in hmac.iter().enumerate() {
             assert_eq!(hash, mac_expected[i]);
         }
-
     }
 
     #[test]
@@ -159,12 +167,25 @@ mod tests {
         let message = "Sample message for keylen=blocklen";
 
         let key: &[u32] = &[
-            0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F, 0x10111213, 0x14151617, 0x18191A1B, 0x1C1D1E1F, 0x20212223, 0x24252627, 0x28292A2B, 0x2C2D2E2F, 0x30313233, 0x34353637, 0x38393A3B, 0x3C3D3E3F, 0x40414243, 0x44454647, 0x48494A4B, 0x4C4D4E4F, 0x50515253, 0x54555657, 0x58595A5B, 0x5C5D5E5F, 0x60616263, 0x64656667, 0x68696A6B, 0x6C6D6E6F, 0x70717273, 0x74757677, 0x78797A7B, 0x7C7D7E7F, 0x80818283, 0x84858687, 0x88898A8B, 0x8C8D8E8F, 0x90919293, 0x94959697, 0x98999A9B, 0x9C9D9E9F, 0xA0A1A2A3, 0xA4A5A6A7, 0xA8A9AAAB, 0xACADAEAF, 0xB0B1B2B3, 0xB4B5B6B7, 0xB8B9BABB, 0xBCBDBEBF, 0xC0C1C2C3, 0xC4C5C6C7
+            0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F, 0x10111213, 0x14151617, 0x18191A1B,
+            0x1C1D1E1F, 0x20212223, 0x24252627, 0x28292A2B, 0x2C2D2E2F, 0x30313233, 0x34353637,
+            0x38393A3B, 0x3C3D3E3F, 0x40414243, 0x44454647, 0x48494A4B, 0x4C4D4E4F, 0x50515253,
+            0x54555657, 0x58595A5B, 0x5C5D5E5F, 0x60616263, 0x64656667, 0x68696A6B, 0x6C6D6E6F,
+            0x70717273, 0x74757677, 0x78797A7B, 0x7C7D7E7F, 0x80818283, 0x84858687, 0x88898A8B,
+            0x8C8D8E8F, 0x90919293, 0x94959697, 0x98999A9B, 0x9C9D9E9F, 0xA0A1A2A3, 0xA4A5A6A7,
+            0xA8A9AAAB, 0xACADAEAF, 0xB0B1B2B3, 0xB4B5B6B7, 0xB8B9BABB, 0xBCBDBEBF, 0xC0C1C2C3,
+            0xC4C5C6C7,
         ];
 
         let mac_expected: &[u64] = &[
-            0xD93EC8D2DE1AD2A9, 0x957CB9B83F14E76A, 0xD6B5E0CCE285079A, 0x127D3B14BCCB7AA7,
-            0x286D4AC0D4CE6421, 0x5F2BC9E6870B33D9, 0x7438BE4AAA20CDA5, 0xC5A912B48B8E27F3
+            0xD93EC8D2DE1AD2A9,
+            0x957CB9B83F14E76A,
+            0xD6B5E0CCE285079A,
+            0x127D3B14BCCB7AA7,
+            0x286D4AC0D4CE6421,
+            0x5F2BC9E6870B33D9,
+            0x7438BE4AAA20CDA5,
+            0xC5A912B48B8E27F3,
         ];
 
         let mut key_bytes = vec![0u8; key.len() * 4];
@@ -175,7 +196,6 @@ mod tests {
         for (i, &hash) in hmac.iter().enumerate() {
             assert_eq!(hash, mac_expected[i]);
         }
-
     }
 
     #[test]
@@ -185,11 +205,14 @@ mod tests {
 
         let key: &[u32] = &[
             0x00, 0x01020304, 0x05060708, 0x090A0B0C, 0x0D0E0F10, 0x11121314, 0x15161718,
-            0x191A1B1C, 0x1D1E1F20, 0x21222324, 0x25262728, 0x292A2B2C, 0x2D2E2F30
+            0x191A1B1C, 0x1D1E1F20, 0x21222324, 0x25262728, 0x292A2B2C, 0x2D2E2F30,
         ];
 
         let mac_expected: &[u64] = &[
-            0x00F3E9A77BB0F06D, 0xE15F160603E42B50, 0x28758808596664C0, 0x3E1AB8FB2B076778
+            0x00F3E9A77BB0F06D,
+            0xE15F160603E42B50,
+            0x28758808596664C0,
+            0x3E1AB8FB2B076778,
         ];
 
         let mut key_bytes = vec![0u8; key.len() * 4];
@@ -200,6 +223,5 @@ mod tests {
         for (i, &hash) in hmac.iter().enumerate() {
             assert_eq!(hash, mac_expected[i]);
         }
-
     }
 }
