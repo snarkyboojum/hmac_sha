@@ -11,15 +11,15 @@ enum HashBlockSize {
 // for HMAC construction algorithm and implementation details
 
 // TODO: this currently only works for SHA-512 where the block size is 1024 bits
-fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
+pub fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
     // determine K0
     use std::cmp::Ordering;
 
     let mut k0 = [0u8; 128];
 
-    println!("text is: {:2x?}\n", text);
-    println!("key is: {:2x?}\n", key);
-    println!("------");
+    //println!("text is: {:2x?}\n", text);
+    //println!("key is: {:2x?}\n", key);
+    //println!("------");
 
     match key.len().cmp(&128) {
         Ordering::Equal => {
@@ -54,42 +54,25 @@ fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
         k0_ipad[i] = ipad[i] ^ item;
         k0_opad[i] = opad[i] ^ item;
     }
-    println!("k0^ipad is: {:2x?}\n", k0_ipad);
+    //println!("k0^ipad is: {:2x?}\n", k0_ipad);
 
     // concat k0 + ipad + text
     k0_ipad.extend(text);
-    println!("(k0^ipad)||text is: {:2x?}\n", k0_ipad);
+    //println!("(k0^ipad)||text is: {:2x?}\n", k0_ipad);
 
     // hash and convert to bytes
     let hash = sha512_hash(&k0_ipad).expect("Couldn't hash k0 + ipad + text");
     let mut hash_bytes = vec![0u8; hash.len() * 8];
     BigEndian::write_u64_into(&hash, &mut hash_bytes);
-    println!("hash((k0^ipad)||text) is: {:2x?}\n", hash);
+    //println!("hash((k0^ipad)||text) is: {:2x?}\n", hash);
 
-    println!("k0^opad is: {:2x?}\n", k0_opad);
+    //println!("k0^opad is: {:2x?}\n", k0_opad);
     // concat (k0 ^ opad) and hash bytes
     k0_opad.extend(&hash_bytes);
     let mac = sha512_hash(&k0_opad).expect("Couldn't do final hash for mac");
     mac
 }
 
-fn main() {
-    println!("Welcome to the HMAC-SHA512 implementation!");
-
-    let message = "Sample message for keylen<blocklen";
-
-    let key: &[u32] = &[
-        0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F, 0x10111213, 0x14151617, 0x18191A1B,
-        0x1C1D1E1F, 0x20212223, 0x24252627, 0x28292A2B, 0x2C2D2E2F, 0x30313233, 0x34353637,
-        0x38393A3B, 0x3C3D3E3F,
-    ];
-
-    let mut key_bytes = vec![0u8; key.len() * 4];
-    BigEndian::write_u32_into(&key, &mut key_bytes);
-
-    let hmac = hmac_sha512(&key_bytes, &message.as_bytes());
-    println!("mac is: {:2x?}", hmac);
-}
 
 #[cfg(test)]
 mod tests {
