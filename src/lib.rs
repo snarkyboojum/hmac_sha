@@ -4,8 +4,9 @@ use byteorder::{BigEndian, ByteOrder};
 use sha_hash::sha512_hash;
 
 #[allow(dead_code)]
-enum HashBlockSize {
-    FiveTwelve = 1024,
+pub enum Hash512 {
+    BlockSize = 1024,
+    DigestSize = 512,
 }
 
 // See https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf
