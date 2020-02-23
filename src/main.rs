@@ -1,53 +1,42 @@
 extern crate sha_hash;
 
+use byteorder::{BigEndian, ByteOrder};
 use sha_hash::sha512_hash;
 
 enum HASH_BLOCK_SIZE {
     FiveTwelve = 1024,
 }
 
-fn key_length_bits(key: &[u32]) -> usize {
-    let key_length = key.len();
-
-    key_length * 32
-}
-
 // See https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.198-1.pdf
 // for HMAC construction algorithm and implementation details
 
 // TODO: this currently only works for SHA-512 where the block size is 1024 bits
-fn hmac_sha512(key: &[u32], text: &[u32]) -> [u32; 16] {
+fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
     // determine K0
-    use byteorder::{BigEndian, ByteOrder};
     use std::cmp::Ordering;
 
     println!("text is: {:2x?}\n", text);
     println!("key is: {:2x?}\n", key);
     println!("------");
 
-    let mut text_bytes = vec![0u8; text.len() * 4];
-    BigEndian::write_u32_into(&text, &mut text_bytes);
-    let mut key_bytes = vec![0u8; key.len() * 4];
-    BigEndian::write_u32_into(&key, &mut key_bytes);
-
-    match key_length_bits(key).cmp(&1024) {
+    match key.len().cmp(&128) {
         Ordering::Equal => {
             let ipad = vec![0x36; 128];
             let opad = vec![0x5c; 128];
 
             let mut k0_ipad = vec![0u8; 128];
             let mut k0_opad = vec![0u8; 128];
-            assert_eq!(key.len() * 4, ipad.len());
-            assert_eq!(key.len() * 4, opad.len());
+            assert_eq!(key.len(), ipad.len());
+            assert_eq!(key.len(), opad.len());
 
-            for (i, item) in key_bytes.iter().enumerate() {
+            for (i, item) in key.iter().enumerate() {
                 k0_ipad[i] = ipad[i] ^ item;
                 k0_opad[i] = opad[i] ^ item;
             }
             println!("k0^ipad is: {:2x?}\n", k0_ipad);
 
             // concat k0 + ipad + text
-            k0_ipad.extend(&text_bytes);
+            k0_ipad.extend(text);
             println!("(k0^ipad)||text is: {:2x?}\n", k0_ipad);
 
             // hash and convert to bytes
@@ -59,27 +48,26 @@ fn hmac_sha512(key: &[u32], text: &[u32]) -> [u32; 16] {
             println!("k0^opad is: {:2x?}\n", k0_opad);
             // concat (k0 ^ opad) and hash bytes
             k0_opad.extend(&hash_bytes);
-            let hmac = sha512_hash(&k0_opad).expect("Couldn't do final hash for mac");
-
-            println!("mac is: {:2x?}", hmac);
-
-            // return hmac;
+            let mac = sha512_hash(&k0_opad).expect("Couldn't do final hash for mac");
+            return mac;
         }
 
         Ordering::Greater => {}
         Ordering::Less => {}
     }
 
-    [0u32; 16]
+    [0u64; 8]
 }
 
 fn main() {
     println!("Welcome to the HMAC-SHA512 implementation!");
 
     let text: &[u32] = &[
-        0x00005361, 0x6D706C65, 0x206D6573, 0x73616765, 0x20666F72, 0x206B6579, 0x6C656E3D,
-        0x626C6F63, 0x6B6C656E,
+        0x5361, 0x6D706C65, 0x206D6573, 0x73616765, 0x20666F72, 0x206B6579, 0x6C656E3D, 0x626C6F63,
+        0x6B6C656E,
     ];
+
+    let message = "Sample message for keylen=blocklen";
 
     let key: &[u32] = &[
         0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F, 0x10111213, 0x14151617, 0x18191A1B,
@@ -89,5 +77,11 @@ fn main() {
         0x70717273, 0x74757677, 0x78797A7B, 0x7C7D7E7F,
     ];
 
-    let mac = hmac_sha512(key, text);
+    let mut text_bytes = vec![0u8; text.len() * 4];
+    BigEndian::write_u32_into(&text, &mut text_bytes);
+    let mut key_bytes = vec![0u8; key.len() * 4];
+    BigEndian::write_u32_into(&key, &mut key_bytes);
+
+    let hmac = hmac_sha512(&key_bytes, &message.as_bytes());
+    println!("mac is: {:2x?}", hmac);
 }
