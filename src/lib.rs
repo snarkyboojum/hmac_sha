@@ -75,7 +75,6 @@ pub fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
     mac
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
