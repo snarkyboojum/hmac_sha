@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 byteorder = "1.3.4"
-sha_hash = { path = "../sha_hash" }
+sha_hash = { git = "https://github.com/snarkyboojum/sha_hash.git"}
