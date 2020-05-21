@@ -1,7 +1,7 @@
 extern crate sha_hash;
 
 use byteorder::{BigEndian, ByteOrder};
-use sha_hash::sha512_hash;
+use sha_hash::sha512;
 
 #[allow(dead_code)]
 pub enum Hash512 {
@@ -28,7 +28,7 @@ pub fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
             k0.copy_from_slice(key);
         }
         Ordering::Greater => {
-            let hashed_key = sha512_hash(key).expect("Couldn't hash key");
+            let hashed_key = sha512::hash(key).expect("Couldn't hash key");
             let mut hashed_key_bytes = vec![0u8; hashed_key.len() * 8];
             BigEndian::write_u64_into(&hashed_key, &mut hashed_key_bytes);
 
@@ -63,7 +63,7 @@ pub fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
     //println!("(k0^ipad)||text is: {:2x?}\n", k0_ipad);
 
     // hash and convert to bytes
-    let hash = sha512_hash(&k0_ipad).expect("Couldn't hash k0 + ipad + text");
+    let hash = sha512::hash(&k0_ipad).expect("Couldn't hash k0 + ipad + text");
     let mut hash_bytes = vec![0u8; hash.len() * 8];
     BigEndian::write_u64_into(&hash, &mut hash_bytes);
     //println!("hash((k0^ipad)||text) is: {:2x?}\n", hash);
@@ -71,7 +71,7 @@ pub fn hmac_sha512(key: &[u8], text: &[u8]) -> [u64; 8] {
     //println!("k0^opad is: {:2x?}\n", k0_opad);
     // concat (k0 ^ opad) and hash bytes
     k0_opad.extend(&hash_bytes);
-    let mac = sha512_hash(&k0_opad).expect("Couldn't do final hash for mac");
+    let mac = sha512::hash(&k0_opad).expect("Couldn't do final hash for mac");
     mac
 }
 
