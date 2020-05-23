@@ -1,6 +1,6 @@
 ## Overview
 
-This is a simple HMAC SHA-512 implemention in Rust. This implemenation could be used for password-based key derivation function implementations like PBKDF2.
+This library is a straightforward implementation of HMAC SHA-512 implementation in Rust. This implementation could be used for password-based key derivation function implementations like PBKDF2.
 
 ## Resources
 
